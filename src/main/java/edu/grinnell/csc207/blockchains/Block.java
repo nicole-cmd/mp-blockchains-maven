@@ -3,7 +3,8 @@ package edu.grinnell.csc207.blockchains;
 /**
  * Blocks to be stored in blockchains.
  *
- * @author Your Name Here
+ * @author Khanh Do
+ * @author Nicole Gorrell
  * @author Samuel A. Rebelsky
  */
 public class Block {
