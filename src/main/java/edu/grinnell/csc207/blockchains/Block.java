@@ -40,8 +40,7 @@ public class Block {
    * @param prevHash The hash of the previous block.
    * @param check The validator used to check the block.
    */
-  public Block(int num, Transaction transaction, Hash prevHash, HashValidator check)
-      throws NoSuchAlgorithmException {
+  public Block(int num, Transaction transaction, Hash prevHash, HashValidator check) {
     this.blockNum = num;
     this.trans = transaction;
     this.prevHash = prevHash;
@@ -64,8 +63,7 @@ public class Block {
    * @param prevHash The hash of the previous block.
    * @param nonce The nonce of the block.
    */
-  public Block(int num, Transaction transaction, Hash prevHash, long nonce)
-      throws NoSuchAlgorithmException {
+  public Block(int num, Transaction transaction, Hash prevHash, long nonce) {
     this.blockNum = num;
     this.trans = transaction;
     this.prevHash = prevHash;
@@ -80,14 +78,24 @@ public class Block {
   /**
    * Compute the hash of the block given all the other info already stored in the block.
    */
-  static byte[] computeHash(int num, Transaction transaction, Hash prevHash, long nonce)
-      throws NoSuchAlgorithmException {
-    MessageDigest md = MessageDigest.getInstance("sha-256");
+  static byte[] computeHash(int num, Transaction transaction, Hash prevHash, long nonce) {
+    MessageDigest md = null;
+    try {
+      md = MessageDigest.getInstance("sha-256");
+    } catch (NoSuchAlgorithmException e) {
+      // Shouldn't happen
+    } // try/catch
 
     ByteBuffer numByte = ByteBuffer.allocate(Integer.BYTES);
     numByte.putInt(num);
     md.update(numByte.array());
-    md.update(transaction.toString().getBytes());
+    md.update(transaction.getSource().getBytes());
+    md.update(transaction.getTarget().getBytes());
+
+    ByteBuffer amountByte = ByteBuffer.allocate(Integer.BYTES);
+    amountByte.putInt(transaction.getAmount());
+    md.update(amountByte.array());
+
     md.update(prevHash.toString().getBytes());
 
     ByteBuffer nonceByte = ByteBuffer.allocate(Long.BYTES);

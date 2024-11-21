@@ -1,13 +1,11 @@
 package edu.grinnell.csc207.blockchains;
 
 import java.nio.ByteBuffer;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -106,7 +104,7 @@ public class TestBlock {
    * Simple block stuff.
    */
   @Test
-  public void simpleBlockTest() throws NoSuchAlgorithmException {
+  public void simpleBlockTest()   {
     Transaction t = new Transaction("Here", "There", 12);
     Hash ph = new Hash(new byte[] {3, 4, 5});
     Block b = new Block(10, t, ph, 67);
@@ -121,7 +119,7 @@ public class TestBlock {
    * Make sure that we can create a hash with a deposit.
    */
   @Test
-  public void depositTest() throws NoSuchAlgorithmException {
+  public void depositTest()   {
     Transaction t = new Transaction("", "Someone", 555);
     Hash ph = new Hash(new byte[] {5, 5, 5, 5, 5});
     Block b = new Block(5, t, ph, 5555);
@@ -136,7 +134,7 @@ public class TestBlock {
    * Simple block stuff with a simple validator.
    */
   @Test
-  public void simpleValidatedBlockTest() throws NoSuchAlgorithmException {
+  public void simpleValidatedBlockTest()   {
     Transaction t = new Transaction("Source", "Target", 100);
     Hash ph = new Hash(new byte[] {(byte) 255});
     Block b = new Block(5, t, ph, (hash) -> true);
@@ -150,7 +148,7 @@ public class TestBlock {
    * A deposit with a simple validator.
    */
   @Test
-  public void simpleValidatedDepositTest() throws NoSuchAlgorithmException {
+  public void simpleValidatedDepositTest()   {
     Transaction t = new Transaction("", "Deposited", 888);
     Hash ph = new Hash(new byte[] {8, 8, 8});
     Block b = new Block(8, t, ph, (hash) -> true);
@@ -164,7 +162,7 @@ public class TestBlock {
    * Simple block stuff with a slightly more complicated validator.
    */
   @Test
-  public void startsWith5ValidatedBlockTest() throws NoSuchAlgorithmException {
+  public void startsWith5ValidatedBlockTest()   {
     Transaction t = new Transaction("Source", "Target", 100);
     Hash ph = new Hash(new byte[] {(byte) 255});
     Block b = new Block(8, t, ph, (h) -> (h.length() > 1) && (h.get(0) == 5));
@@ -179,7 +177,7 @@ public class TestBlock {
    * A deposit with a slightly more complicated validator.
    */
   @Test
-  public void startsWith7ValidatedDepositTest() throws NoSuchAlgorithmException {
+  public void startsWith7ValidatedDepositTest()   {
     Transaction t = new Transaction("", "A Nony Moose", 777);
     Hash ph = new Hash(new byte[] {77, 77, 77, 77});
     Block b = new Block(7, t, ph, (h) -> (h.length() > 0) && (h.get(0) == 7));
@@ -194,7 +192,7 @@ public class TestBlock {
    * Ensure that the block calculates the correct hash.
    */
   @Test
-  public void hashTest() throws NoSuchAlgorithmException {
+  public void hashTest()   {
     Transaction t = new Transaction("Sam", "Sam", 50);
     Hash ph = new Hash(new byte[] {10, 20, 30, 40, 50});
     Block b = new Block(5, t, ph, 100);
@@ -205,7 +203,7 @@ public class TestBlock {
    * Ensure that a block with a validated hash calculates a correct and valid hash.
    */
   @Test
-  public void aValidatedHashTest() throws NoSuchAlgorithmException {
+  public void aValidatedHashTest()   {
     Transaction t = new Transaction("Rebel", "Sky", 250);
     Hash ph = new Hash(new byte[] {42, 42, 42, 42, 42, 42});
     Block b = new Block(5, t, ph, (h) -> (h.length() > 0) && (h.get(0) == 0));
@@ -217,7 +215,7 @@ public class TestBlock {
    * Ensure that we can create the standard initial block.
    */
   @Test
-  public void initialBlockTest() throws NoSuchAlgorithmException {
+  public void initialBlockTest()   {
     Transaction t = new Transaction("", "", 0);
     Hash ph = new Hash(new byte[] {});
     Block b = new Block(0, t, ph, (hash) -> true);
