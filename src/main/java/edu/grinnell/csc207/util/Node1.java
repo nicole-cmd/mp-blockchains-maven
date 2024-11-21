@@ -9,7 +9,7 @@ import edu.grinnell.csc207.blockchains.Block;
  *
  * @param <T> The type of value stored in the nodes (and structures built from the nodes).
  */
-public class Node1<Block> {
+public class Node1 {
   // +--------+------------------------------------------------------
   // | Fields |
   // +--------+
@@ -22,7 +22,7 @@ public class Node1<Block> {
   /**
    * The next node.
    */
-  Node1<Block> next;
+  Node1 next;
 
   // +--------------+------------------------------------------------
   // | Constructors |
@@ -34,7 +34,7 @@ public class Node1<Block> {
    * @param val The value to be stored in the node.
    * @param nextNode The next node in the list (or null, if it's the end of the list).
    */
-  public Node1(Block val, Node1<Block> nextNode) {
+  public Node1(Block val, Node1 nextNode) {
     this.value = val;
     this.next = nextNode;
   } // Node1(Block, Node1<Block>)
@@ -68,8 +68,8 @@ public class Node1<Block> {
    *
    * @return the next node.
    */
-  public Block getNext() {
-    return this.next.getValue();
+  public Node1 getNext() {
+    return this.next;
   } // getNext()
 
   /**
@@ -78,8 +78,8 @@ public class Node1<Block> {
    * @param val The value to insert.
    * @return The newly created node that contains the value.
    */
-  public Node1<Block> insertAfter(Block val) {
-    Node1<Block> tmp = new Node1<Block>(val, this.next);
+  public Node1 insertAfter(Block val) {
+    Node1 tmp = new Node1(val, this.next);
     this.next = tmp;
     return tmp;
   } // insertAfter

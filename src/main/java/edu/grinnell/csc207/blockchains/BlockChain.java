@@ -2,6 +2,8 @@ package edu.grinnell.csc207.blockchains;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.HashMap;
+
 import edu.grinnell.csc207.util.Node1;
 
 /**
@@ -14,13 +16,15 @@ public class BlockChain implements Iterable<Transaction> {
   // +--------+------------------------------------------------------
   // | Fields |
   // +--------+
-  Node1<Block> first;
+  Node1 first;
 
-  Node1<Block> last;
+  Node1 last;
 
   int size = 0;
 
   HashValidator check;
+
+  HashMap<String, Integer> balances;
 
   // +--------------+------------------------------------------------
   // | Constructors |
@@ -40,6 +44,8 @@ public class BlockChain implements Iterable<Transaction> {
     this.first = new Node1(firstBlock);
     this.last = this.first;
     ++size;
+
+    this.balances = new HashMap();
   } // BlockChain(HashValidator)
 
   // +---------+-----------------------------------------------------
@@ -57,7 +63,7 @@ public class BlockChain implements Iterable<Transaction> {
    *
    * @return a new block with correct number, hashes, and such.
    */
-  public Block mine(Transaction t)   {
+  public Block mine(Transaction t) {
     return new Block(10, t, new Hash(new byte[] {7}), 11); // STUB
   } // mine(Transaction)
 
@@ -98,6 +104,7 @@ public class BlockChain implements Iterable<Transaction> {
 
     this.last = this.last.insertAfter(blk);
     ++size;
+    balances.put(blk.getTransaction().getSource(), blk.getTransaction().getAmount());
   } // append()
 
   /**
@@ -107,9 +114,11 @@ public class BlockChain implements Iterable<Transaction> {
    *         otherwise (in which case the last block is removed).
    */
   public boolean removeLast() {
+    String tmp = this.last.getValue().getTransaction().getSource();
     if (this.size == 1) {
       return false;
     } // if
+    balances.remove(tmp);
     this.last.remove();
     --size;
     return true;
@@ -132,7 +141,10 @@ public class BlockChain implements Iterable<Transaction> {
    * @throws Exception If things are wrong at any block.
    */
   public boolean isCorrect() {
-    return true; // STUB
+    Node1 current = this.first;
+    Node1 prev = null;
+
+    return true;
   } // isCorrect()
 
   /**
@@ -152,13 +164,28 @@ public class BlockChain implements Iterable<Transaction> {
    * @return an iterator of all the people in the system.
    */
   public Iterator<String> users() {
-    return new Iterator<String>() {
+    return new Iterator<String>() {int pos;
+      Node1 next;
+      Node1 update;
+
       public boolean hasNext() {
-        return false; // STUB
+        return (pos < size);
       } // hasNext()
 
+      @Override
       public String next() {
-        throw new NoSuchElementException(); // STUB
+        if (!this.hasNext()) {
+          throw new NoSuchElementException();
+        } // if
+
+        // Identify the node to update
+        this.update = this.next;
+        this.next = this.next.getNext();
+        // Note the movement
+        ++this.pos;
+
+        // And return the value
+        return this.update.getValue().getTransaction().getSource();
       } // next()
     };
   } // users()
@@ -171,7 +198,10 @@ public class BlockChain implements Iterable<Transaction> {
    * @return that user's balance (or 0, if the user is not in the system).
    */
   public int balance(String user) {
-    return 0; // STUB
+    if (!this.balances.containsKey(user)) {
+      return 0;
+    } // if
+    return this.balances.get(user);
   } // balance()
 
   /**
@@ -181,12 +211,28 @@ public class BlockChain implements Iterable<Transaction> {
    */
   public Iterator<Block> blocks() {
     return new Iterator<Block>() {
+      int pos;
+      Node1 next;
+      Node1 update;
+
       public boolean hasNext() {
-        return false; // STUB
+        return (pos < size);
       } // hasNext()
 
+      @Override
       public Block next() {
-        throw new NoSuchElementException(); // STUB
+        if (!this.hasNext()) {
+          throw new NoSuchElementException();
+        } // if
+
+        // Identify the node to update
+        this.update = this.next;
+        this.next = this.next.getNext();
+        // Note the movement
+        ++this.pos;
+
+        // And return the value
+        return this.update.getValue();
       } // next()
     };
   } // blocks()
@@ -198,12 +244,28 @@ public class BlockChain implements Iterable<Transaction> {
    */
   public Iterator<Transaction> iterator() {
     return new Iterator<Transaction>() {
+      int pos;
+      Node1 next;
+      Node1 update;
+
       public boolean hasNext() {
-        return false; // STUB
+        return (pos < size);
       } // hasNext()
 
+      @Override
       public Transaction next() {
-        throw new NoSuchElementException(); // STUB
+        if (!this.hasNext()) {
+          throw new NoSuchElementException();
+        } // if
+
+        // Identify the node to update
+        this.update = this.next;
+        this.next = this.next.getNext();
+        // Note the movement
+        ++this.pos;
+
+        // And return the value
+        return this.update.getValue().getTransaction();
       } // next()
     };
   } // iterator()
