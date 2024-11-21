@@ -11,11 +11,10 @@ import java.util.NoSuchElementException;
  * These do *not* (yet) support the Fail Fast policy.
  *
  * @author Samuel A. Rebelsky
- * @author Your Name Here
- * @author Your Name Here
+ * @author Khanh Do
+ * @author Mina Bakrac
  *
- * @param <T>
- *   The type of elements stored in the list.
+ * @param <T> The type of elements stored in the list.
  */
 public class SimpleDLL<T> implements SimpleList<T> {
   // +--------+------------------------------------------------------------
@@ -69,22 +68,20 @@ public class SimpleDLL<T> implements SimpleList<T> {
       // +--------+
 
       /**
-       * The position in the list of the next value to be returned.
-       * Included because ListIterators must provide nextIndex and
-       * prevIndex.
+       * The position in the list of the next value to be returned. Included because ListIterators
+       * must provide nextIndex and prevIndex.
        */
       int pos = 0;
 
       /**
-       * The cursor is between neighboring values, so we start links
-       * to the previous and next value..
+       * The cursor is between neighboring values, so we start links to the previous and next
+       * value..
        */
       Node2<T> prev = null;
       Node2<T> next = SimpleDLL.this.front;
 
       /**
-       * The node to be updated by remove or set.  Has a value of
-       * null when there is no such value.
+       * The node to be updated by remove or set. Has a value of null when there is no such value.
        */
       Node2<T> update = null;
 
@@ -112,7 +109,7 @@ public class SimpleDLL<T> implements SimpleList<T> {
         // Increase the size
         ++SimpleDLL.this.size;
 
-        // Update the position.  (See SimpleArrayList.java for more of
+        // Update the position. (See SimpleArrayList.java for more of
         // an explanation.)
         ++this.pos;
       } // add(T)

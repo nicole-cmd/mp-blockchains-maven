@@ -44,11 +44,9 @@ public class TestBlock {
   /**
    * Convert an integer into its bytes.
    *
-   * @param i
-   *   The integer to convert.
+   * @param i The integer to convert.
    *
-   * @return
-   *   The bytes of that integer.
+   * @return The bytes of that integer.
    */
   static byte[] intToBytes(int i) {
     intBuffer.clear();
@@ -58,11 +56,9 @@ public class TestBlock {
   /**
    * Convert a long into its bytes.
    *
-   * @param l
-   *   The long to convert.
+   * @param l The long to convert.
    *
-   * @return
-   *   The bytes in that long.
+   * @return The bytes in that long.
    */
   static byte[] longToBytes(long l) {
     longBuffer.clear();
@@ -72,8 +68,7 @@ public class TestBlock {
   /**
    * Compute the expected hash of a block.
    *
-   * @param block
-   *   The block whose hash we want to compute.
+   * @param block The block whose hash we want to compute.
    *
    * @return the expected hash of that block.
    */
@@ -111,11 +106,11 @@ public class TestBlock {
    * Simple block stuff.
    */
   @Test
-  public void simpleBlockTest() {
+  public void simpleBlockTest() throws NoSuchAlgorithmException {
     Transaction t = new Transaction("Here", "There", 12);
     Hash ph = new Hash(new byte[] {3, 4, 5});
     Block b = new Block(10, t, ph, 67);
-    
+
     assertEquals(10, b.getNum(), "number of block");
     assertEquals(t, b.getTransaction(), "transaction in block");
     assertEquals(ph, b.getPrevHash(), "previous hash");
@@ -126,11 +121,11 @@ public class TestBlock {
    * Make sure that we can create a hash with a deposit.
    */
   @Test
-  public void depositTest() {
+  public void depositTest() throws NoSuchAlgorithmException {
     Transaction t = new Transaction("", "Someone", 555);
     Hash ph = new Hash(new byte[] {5, 5, 5, 5, 5});
     Block b = new Block(5, t, ph, 5555);
-    
+
     assertEquals(5, b.getNum(), "number of block for deposit");
     assertEquals(t, b.getTransaction(), "deposit in block");
     assertEquals(ph, b.getPrevHash(), "previous hash for deposit");
@@ -141,7 +136,7 @@ public class TestBlock {
    * Simple block stuff with a simple validator.
    */
   @Test
-  public void simpleValidatedBlockTest() {
+  public void simpleValidatedBlockTest() throws NoSuchAlgorithmException {
     Transaction t = new Transaction("Source", "Target", 100);
     Hash ph = new Hash(new byte[] {(byte) 255});
     Block b = new Block(5, t, ph, (hash) -> true);
@@ -155,24 +150,21 @@ public class TestBlock {
    * A deposit with a simple validator.
    */
   @Test
-  public void simpleValidatedDepositTest() {
+  public void simpleValidatedDepositTest() throws NoSuchAlgorithmException {
     Transaction t = new Transaction("", "Deposited", 888);
     Hash ph = new Hash(new byte[] {8, 8, 8});
     Block b = new Block(8, t, ph, (hash) -> true);
 
-    assertEquals(8, b.getNum(), 
-        "number of validated deposit block");
-    assertEquals(t, b.getTransaction(), 
-        "transaction in validated deposit block");
-    assertEquals(ph, b.getPrevHash(), 
-        "previous hash in validated deposit block");
+    assertEquals(8, b.getNum(), "number of validated deposit block");
+    assertEquals(t, b.getTransaction(), "transaction in validated deposit block");
+    assertEquals(ph, b.getPrevHash(), "previous hash in validated deposit block");
   } // simpleValidatedBlockTest
 
   /**
    * Simple block stuff with a slightly more complicated validator.
    */
-   @Test
-   public void startsWith5ValidatedBlockTest() {
+  @Test
+  public void startsWith5ValidatedBlockTest() throws NoSuchAlgorithmException {
     Transaction t = new Transaction("Source", "Target", 100);
     Hash ph = new Hash(new byte[] {(byte) 255});
     Block b = new Block(8, t, ph, (h) -> (h.length() > 1) && (h.get(0) == 5));
@@ -186,27 +178,23 @@ public class TestBlock {
   /**
    * A deposit with a slightly more complicated validator.
    */
-   @Test
-   public void startsWith7ValidatedDepositTest() {
+  @Test
+  public void startsWith7ValidatedDepositTest() throws NoSuchAlgorithmException {
     Transaction t = new Transaction("", "A Nony Moose", 777);
     Hash ph = new Hash(new byte[] {77, 77, 77, 77});
     Block b = new Block(7, t, ph, (h) -> (h.length() > 0) && (h.get(0) == 7));
 
-    assertEquals(7, b.getNum(), 
-        "number of 7-valid deposit block");
-    assertEquals(t, b.getTransaction(), 
-        "transaction in 7-valid deposit block");
-    assertEquals(ph, b.getPrevHash(), 
-        "previous hash in 7-valid deposit block");
-    assertEquals(7, b.getHash().get(0), 
-        "valid hash in 7-valid deposit block (starts with 7)");
+    assertEquals(7, b.getNum(), "number of 7-valid deposit block");
+    assertEquals(t, b.getTransaction(), "transaction in 7-valid deposit block");
+    assertEquals(ph, b.getPrevHash(), "previous hash in 7-valid deposit block");
+    assertEquals(7, b.getHash().get(0), "valid hash in 7-valid deposit block (starts with 7)");
   } // anotherValidatedDepositTest()
 
   /**
    * Ensure that the block calculates the correct hash.
    */
   @Test
-  public void hashTest() {
+  public void hashTest() throws NoSuchAlgorithmException {
     Transaction t = new Transaction("Sam", "Sam", 50);
     Hash ph = new Hash(new byte[] {10, 20, 30, 40, 50});
     Block b = new Block(5, t, ph, 100);
@@ -214,29 +202,25 @@ public class TestBlock {
   } // hashTest()
 
   /**
-   * Ensure that a block with a validated hash calculates a correct
-   * and valid hash.
+   * Ensure that a block with a validated hash calculates a correct and valid hash.
    */
   @Test
-  public void aValidatedHashTest() {
+  public void aValidatedHashTest() throws NoSuchAlgorithmException {
     Transaction t = new Transaction("Rebel", "Sky", 250);
     Hash ph = new Hash(new byte[] {42, 42, 42, 42, 42, 42});
     Block b = new Block(5, t, ph, (h) -> (h.length() > 0) && (h.get(0) == 0));
-    assertEquals(0, b.getHash().get(0), 
-        "hash in validated block starts with 0");
-    assertArrayEquals(expectedHash(b), b.getHash().getBytes(), 
-        "correct hash in validated block");
+    assertEquals(0, b.getHash().get(0), "hash in validated block starts with 0");
+    assertArrayEquals(expectedHash(b), b.getHash().getBytes(), "correct hash in validated block");
   } // validatedHashTest()
 
   /**
    * Ensure that we can create the standard initial block.
    */
   @Test
-  public void initialBlockTest() {
+  public void initialBlockTest() throws NoSuchAlgorithmException {
     Transaction t = new Transaction("", "", 0);
     Hash ph = new Hash(new byte[] {});
-    Block b = 
-        new Block(0, t, ph, (hash) -> true);
+    Block b = new Block(0, t, ph, (hash) -> true);
 
     assertEquals(0, b.getNum(), "correct number in initial block");
     assertEquals(t, b.getTransaction(), "correct transaction in initial block");
@@ -244,19 +228,15 @@ public class TestBlock {
   } // initialBlockTest()
 
   /**
-   * Test that the toString method works.
-   * Forthcoming.
+   * Test that the toString method works. Forthcoming.
    */
   @Test
-  public void toStringTest() {
-  } // toStringTest()
+  public void toStringTest() {} // toStringTest()
 
   /**
-   * Test that the toString method works with a deposit.
-   * Forthcoming.
+   * Test that the toString method works with a deposit. Forthcoming.
    */
   @Test
-  public void toStringDepositTest() {
-  } // toStringDepositTest()
+  public void toStringDepositTest() {} // toStringDepositTest()
 
 } // class TestBlock

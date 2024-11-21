@@ -1,8 +1,9 @@
 package edu.grinnell.csc207.blockchains;
 
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.nio.ByteBuffer;
+import java.util.Random;
 
 /**
  * Blocks to be stored in blockchains.
@@ -22,7 +23,7 @@ public class Block {
 
   Hash prevHash;
 
-  int nonce;  
+  int nonce;
 
   Hash hash;
 
@@ -31,42 +32,40 @@ public class Block {
   // +--------------+
 
   /**
-   * Create a new block from the specified block number, transaction, and
-   * previous hash, mining to choose a nonce that meets the requirements
-   * of the validator.
+   * Create a new block from the specified block number, transaction, and previous hash, mining to
+   * choose a nonce that meets the requirements of the validator.
    *
-   * @param num
-   *   The number of the block.
-   * @param transaction
-   *   The transaction for the block.
-   * @param prevHash
-   *   The hash of the previous block.
-   * @param check
-   *   The validator used to check the block.
+   * @param num The number of the block.
+   * @param transaction The transaction for the block.
+   * @param prevHash The hash of the previous block.
+   * @param check The validator used to check the block.
    */
-  public Block(int num, Transaction transaction, Hash prevHash,
-      HashValidator check) {
+  public Block(int num, Transaction transaction, Hash prevHash, HashValidator check)
+      throws NoSuchAlgorithmException {
     this.blockNum = num;
     this.trans = transaction;
     this.prevHash = prevHash;
+    long tempNonce = 0;
     HashValidator standardValidator =
-    (hash) -> (hash.length() >= 3) && (hash.get(0) == 0)
-        && (hash.get(1) == 0) && (hash.get(2) == 0);
+        (h) -> (h.length() >= 3) && (h.get(0) == 0) && (h.get(1) == 0) && (h.get(2) == 0);
+    while (standardValidator
+        .isValid(new Hash(computeHash(num, transaction, prevHash, tempNonce))) == false) {
+      Random rand = new Random();
+      tempNonce = rand.nextLong();
+    } // while
+    this.nonce = (int) tempNonce;
   } // Block(int, Transaction, Hash, HashValidator)
 
   /**
    * Create a new block, computing the hash for the block.
    *
-   * @param num
-   *   The number of the block.
-   * @param transaction
-   *   The transaction for the block.
-   * @param prevHash
-   *   The hash of the previous block.
-   * @param nonce
-   *   The nonce of the block.
+   * @param num The number of the block.
+   * @param transaction The transaction for the block.
+   * @param prevHash The hash of the previous block.
+   * @param nonce The nonce of the block.
    */
-  public Block(int num, Transaction transaction, Hash prevHash, long nonce) throws NoSuchAlgorithmException {
+  public Block(int num, Transaction transaction, Hash prevHash, long nonce)
+      throws NoSuchAlgorithmException {
     this.blockNum = num;
     this.trans = transaction;
     this.prevHash = prevHash;
@@ -76,21 +75,22 @@ public class Block {
 
   // +---------+-----------------------------------------------------
   // | Helpers |
-  // +---------+
+  // +---------+)
 
   /**
-   * Compute the hash of the block given all the other info already
-   * stored in the block.
+   * Compute the hash of the block given all the other info already stored in the block.
    */
-  static byte[] computeHash(int num, Transaction transaction, Hash prevHash, long nonce) throws NoSuchAlgorithmException {
+  static byte[] computeHash(int num, Transaction transaction, Hash prevHash, long nonce)
+      throws NoSuchAlgorithmException {
     MessageDigest md = MessageDigest.getInstance("sha-256");
 
-    ByteBuffer numByte = ByteBuffer.allocate(1);
+    ByteBuffer numByte = ByteBuffer.allocate(Integer.BYTES);
     numByte.putInt(num);
     md.update(numByte.array());
     md.update(transaction.toString().getBytes());
     md.update(prevHash.toString().getBytes());
-    ByteBuffer nonceByte = ByteBuffer.allocate(1);
+
+    ByteBuffer nonceByte = ByteBuffer.allocate(Long.BYTES);
     nonceByte.putLong(nonce);
     md.update(nonceByte.array());
 
@@ -98,8 +98,8 @@ public class Block {
   } // computeHash()
 
   // /**
-  //  * Generate nonce numbers.
-  //  */
+  // * Generate nonce numbers.
+  // */
   // static long generateNonce() {
 
   // } // generateNonce()
@@ -157,17 +157,20 @@ public class Block {
    *
    * @return a string representation of the block.
    */
+  @Override
   public String toString() {
     StringBuilder str = new StringBuilder();
 
     str.append("Block " + getNum() + " (Transaction: [");
-    if(this.trans.getSource().equals("")) {
+    if (this.trans.getSource().equals("")) {
       str.append("Deposit ");
     } else {
       str.append("Source: " + this.trans.getSource());
     } // if/else
 
-    str.append(", Target: " + this.trans.getTarget() + ", Amount: " + this.trans.getAmount() + "], Nonce: " + this.getNonce() + ", prevHash: " + this.getPrevHash() + ", hash: " + this.getHash() + ")");
+    str.append(", Target: " + this.trans.getTarget() + ", Amount: " + this.trans.getAmount()
+        + "], Nonce: " + this.getNonce() + ", prevHash: " + this.getPrevHash() + ", hash: "
+        + this.getHash() + ")");
     return str.toString();
   } // toString()
 } // class Block
