@@ -1,5 +1,6 @@
 package edu.grinnell.csc207.blockchains;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -42,7 +43,7 @@ public class BlockChain implements Iterable<Transaction> {
    *
    * @return a new block with correct number, hashes, and such.
    */
-  public Block mine(Transaction t) {
+  public Block mine(Transaction t) throws NoSuchAlgorithmException {
     return new Block(10, t, new Hash(new byte[] {7}), 11); // STUB
   } // mine(Transaction)
 
@@ -58,7 +59,12 @@ public class BlockChain implements Iterable<Transaction> {
   /**
    * Add a block to the end of the chain.
    *
-   * @param blk The block to add to the end of the chain.
+   * @param blk
+   *   The block to add to the end of the chain.
+   *
+   * @throws IllegalArgumentException if (a) the hash is not valid, (b)
+   *   the hash is not appropriate for the contents, or (c) the previous
+   *   hash is incorrect.
    */
   public void append(Block blk) {
     // STUB
@@ -84,15 +90,30 @@ public class BlockChain implements Iterable<Transaction> {
   } // getHash()
 
   /**
-   * Determine if the blockchain is correct in that (a) the balances are legal/correct at every
-   * step, (b) that every block has a correct previous hash field, (c) that every block has a hash
-   * that is correct for its contents, and (d) that every block has a valid hash.
+   * Determine if the blockchain is correct in that (a) the balances are
+   * legal/correct at every step, (b) that every block has a correct
+   * previous hash field, (c) that every block has a hash that is correct
+   * for its contents, and (d) that every block has a valid hash.
    *
-   * @return true if the blockchain is correct and false otherwise.
+   * @throws Exception
+   *   If things are wrong at any block.
    */
   public boolean isCorrect() {
-    return true; // STUB
+    return true;        // STUB
   } // isCorrect()
+
+  /**
+   * Determine if the blockchain is correct in that (a) the balances are
+   * legal/correct at every step, (b) that every block has a correct
+   * previous hash field, (c) that every block has a hash that is correct
+   * for its contents, and (d) that every block has a valid hash.
+   *
+   * @throws Exception
+   *   If things are wrong at any block.
+   */
+  public void check() throws Exception {
+    // STUB
+  } // check()
 
   /**
    * Return an iterator of all the people who participated in the system.
