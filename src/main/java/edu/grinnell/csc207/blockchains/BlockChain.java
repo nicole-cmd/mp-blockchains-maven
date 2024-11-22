@@ -107,7 +107,20 @@ public class BlockChain implements Iterable<Transaction> {
 
     this.last = this.last.insertAfter(blk);
     ++size;
-    balances.put(blk.getTransaction().getSource(), blk.getTransaction().getAmount());
+
+    if (blk.getTransaction().getSource().equals("")) {
+      if (balances.containsKey(blk.getTransaction().getTarget())) {
+        balances.put(blk.getTransaction().getTarget(),
+            balances.get(blk.getTransaction().getTarget()) + blk.getTransaction().getAmount());
+      } else {
+        balances.put(blk.getTransaction().getTarget(), blk.getTransaction().getAmount());
+      } // if/else
+    } else {
+      balances.put(blk.getTransaction().getSource(),
+          balances.get(blk.getTransaction().getSource()) - blk.getTransaction().getAmount());
+      balances.put(blk.getTransaction().getTarget(),
+          balances.get(blk.getTransaction().getTarget()) + blk.getTransaction().getAmount());
+    } // if/else
   } // append()
 
   /**
@@ -160,37 +173,41 @@ public class BlockChain implements Iterable<Transaction> {
    * @throws Exception If things are wrong at any block.
    */
   public void check() throws Exception {
-    Iterator<Block> iterator = this.blocks();
-    while (iterator.hasNext()) {
-      Block current = iterator.next();
-
-      if (current.equals(this.first.getValue())) {
-        continue;
-      } // if
-
+    Node1 prev = null;
+    Node1 current = this.first;
+    while (current != null) {
       // (a) the balances are legal/correct at every step
-      if (current.getTransaction().getAmount() > this.balances
-          .get(current.getTransaction().getSource())) {
+      if (current.getValue().getTransaction().getAmount() > this.balances
+          .get(current.getValue().getTransaction().getSource())) {
         throw new Exception("The balances are not legal/correct at every step.");
       } // if
 
-      // (b) every block has a correct previous hash field
-      if (!current.getPrevHash().equals(current.getPrevHash())) {
-        throw new Exception("Every block has a correct previous hash field.");
+      // (b) that every block has a correct previous hash field
+      if (prev != null && !current.getValue().getPrevHash().equals(prev.getValue().getHash())) {
+        throw new Exception("Every block does not have a correct previous hash field.");
       } // if
 
-      // (c) every block has a hash that is correct for its contents
-      Hash temp = new Hash(Block.computeHash(current.getNum(), current.getTransaction(),
-          current.getHash(), current.getNonce()));
-      if (!current.getHash().equals(temp)) {
-        throw new Exception("Every block has a hash that is correct for its contents.");
+      // (c) that every block has a hash that is correct for its contents
+      Hash temp = new Hash(
+          Block.computeHash(current.getValue().getNum(), current.getValue().getTransaction(),
+              current.getValue().getPrevHash(), current.getValue().getNonce()));
+      if (!current.getValue().getHash().equals(temp)) {
+        throw new Exception("Every block does not have a hash that is correct for its contents.");
       } // if
 
-      // (d) every block has a valid hash
-      if (!this.check.isValid(current.getHash())) {
-        throw new Exception("Every block has a valid hash.");
+      // (d) that every block has a valid hash
+      if (!this.check.isValid(current.getValue().getHash())) {
+        throw new Exception("Every block does not have a valid hash.");
       } // if
+
+      prev = current;
+      try {
+        current = current.getNext();
+      } catch (Exception e) {
+        break;
+      } // try/catch
     } // while
+
   } // check()
 
   /**
@@ -240,7 +257,7 @@ public class BlockChain implements Iterable<Transaction> {
    */
   public Iterator<Block> blocks() {
     return new Iterator<Block>() {
-      int pos;
+      int pos = 0;
       Node1 next;
       Node1 update;
 
@@ -258,6 +275,7 @@ public class BlockChain implements Iterable<Transaction> {
         // Identify the node to update
         this.update = this.next;
         this.next = this.next.getNext();
+
         // Note the movement
         ++this.pos;
 
@@ -275,7 +293,7 @@ public class BlockChain implements Iterable<Transaction> {
   @Override
   public Iterator<Transaction> iterator() {
     return new Iterator<Transaction>() {
-      int pos;
+      int pos = 0;
       Node1 next;
       Node1 update;
 
