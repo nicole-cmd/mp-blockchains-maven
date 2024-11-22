@@ -17,14 +17,44 @@ public class Block {
   // | Fields |
   // +--------+
 
+  /**
+   * The message digest used to compute hashes.
+   */
+  static MessageDigest md = null;
+
+  /**
+   * The byte buffer used for ints.
+   */
+  static ByteBuffer intBuffer = ByteBuffer.allocate(Integer.BYTES);
+
+  /**
+   * The byte buffer used for longs.
+   */
+  static ByteBuffer longBuffer = ByteBuffer.allocate(Long.BYTES);
+
+  /**
+   * The number of the block.
+   */
   int blockNum;
 
-  Transaction trans;
+  /**
+   * The transaction stored in the block.
+   */
+  Transaction transaction;
 
+  /**
+   * The hash of the previous block.
+   */
   Hash prevHash;
 
-  int nonce;
+  /**
+   * The nonce of the block.
+   */
+  long nonce;
 
+  /**
+   * The hash of the block.
+   */
   Hash hash;
 
   // +--------------+------------------------------------------------
@@ -42,17 +72,15 @@ public class Block {
    */
   public Block(int num, Transaction transaction, Hash prevHash, HashValidator check) {
     this.blockNum = num;
-    this.trans = transaction;
+    this.transaction = transaction;
     this.prevHash = prevHash;
     long tempNonce = 0;
-    HashValidator standardValidator =
-        (h) -> (h.length() >= 3) && (h.get(0) == 0) && (h.get(1) == 0) && (h.get(2) == 0);
-    while (standardValidator
-        .isValid(new Hash(computeHash(num, transaction, prevHash, tempNonce))) == false) {
+    while (!check.isValid(new Hash(computeHash(num, transaction, prevHash, tempNonce)))) {
       Random rand = new Random();
       tempNonce = rand.nextLong();
     } // while
-    this.nonce = (int) tempNonce;
+    this.nonce = tempNonce;
+    this.hash = new Hash(computeHash(num, transaction, prevHash, this.nonce));
   } // Block(int, Transaction, Hash, HashValidator)
 
   /**
@@ -65,9 +93,9 @@ public class Block {
    */
   public Block(int num, Transaction transaction, Hash prevHash, long nonce) {
     this.blockNum = num;
-    this.trans = transaction;
+    this.transaction = transaction;
     this.prevHash = prevHash;
-    this.nonce = (int) nonce;
+    this.nonce = nonce;
     this.hash = new Hash(computeHash(num, transaction, prevHash, nonce));
   } // Block(int, Transaction, Hash, long)
 
@@ -79,31 +107,44 @@ public class Block {
    * Compute the hash of the block given all the other info already stored in the block.
    */
   static byte[] computeHash(int num, Transaction transaction, Hash prevHash, long nonce) {
-    MessageDigest md = null;
     try {
       md = MessageDigest.getInstance("sha-256");
     } catch (NoSuchAlgorithmException e) {
       // Shouldn't happen
     } // try/catch
 
-    ByteBuffer numByte = ByteBuffer.allocate(Integer.BYTES);
-    numByte.putInt(num);
-    md.update(numByte.array());
+    md.update(intToBytes(num));
     md.update(transaction.getSource().getBytes());
     md.update(transaction.getTarget().getBytes());
-
-    ByteBuffer amountByte = ByteBuffer.allocate(Integer.BYTES);
-    amountByte.putInt(transaction.getAmount());
-    md.update(amountByte.array());
-
-    md.update(prevHash.toString().getBytes());
-
-    ByteBuffer nonceByte = ByteBuffer.allocate(Long.BYTES);
-    nonceByte.putLong(nonce);
-    md.update(nonceByte.array());
-
+    md.update(intToBytes(transaction.getAmount()));
+    md.update(prevHash.getBytes());
+    md.update(longToBytes(nonce));
     return md.digest();
   } // computeHash()
+
+  /**
+   * Convert a long into its bytes.
+   *
+   * @param l The long to convert.
+   *
+   * @return The bytes in that long.
+   */
+  static byte[] longToBytes(long l) {
+    longBuffer.clear();
+    return longBuffer.putLong(l).array();
+  } // longToBytes()
+
+  /**
+   * Convert an integer into its bytes.
+   *
+   * @param i The integer to convert.
+   *
+   * @return The bytes of that integer.
+   */
+  static byte[] intToBytes(int i) {
+    intBuffer.clear();
+    return intBuffer.putInt(i).array();
+  } // intToBytes(int)
 
   // /**
   // * Generate nonce numbers.
@@ -130,7 +171,7 @@ public class Block {
    * @return the transaction.
    */
   public Transaction getTransaction() {
-    return this.trans;
+    return this.transaction;
   } // getTransaction()
 
   /**
@@ -170,15 +211,15 @@ public class Block {
     StringBuilder str = new StringBuilder();
 
     str.append("Block " + getNum() + " (Transaction: [");
-    if (this.trans.getSource().equals("")) {
+    if (this.transaction.getSource().equals("")) {
       str.append("Deposit ");
     } else {
-      str.append("Source: " + this.trans.getSource());
+      str.append("Source: " + this.transaction.getSource());
     } // if/else
 
-    str.append(", Target: " + this.trans.getTarget() + ", Amount: " + this.trans.getAmount()
-        + "], Nonce: " + this.getNonce() + ", prevHash: " + this.getPrevHash() + ", hash: "
-        + this.getHash() + ")");
+    str.append(", Target: " + this.transaction.getTarget() + ", Amount: "
+        + this.transaction.getAmount() + "], Nonce: " + this.getNonce() + ", prevHash: "
+        + this.getPrevHash() + ", hash: " + this.getHash() + ")");
     return str.toString();
   } // toString()
 } // class Block
