@@ -161,6 +161,11 @@ public class BlockChain implements Iterable<Transaction> {
     Iterator<Block> iterator = this.blocks();
     while (iterator.hasNext()) {
       Block current = iterator.next();
+
+      if (current.equals(this.first.getValue())) {
+        continue;
+      } // if
+
       // (a) the balances are legal/correct at every step
       if (current.getTransaction().getAmount() > this.balances
           .get(current.getTransaction().getSource())) {

@@ -79,7 +79,12 @@ public class Node1 {
    * @return The newly created node that contains the value.
    */
   public Node1 insertAfter(Block val) {
-    Node1 tmp = new Node1(val, this.next);
+    Node1 tmp;
+    if (this.next == null) {
+      tmp = new Node1(val);
+    } else {
+      tmp = new Node1(val, this.next);
+    }
     this.next = tmp;
     return tmp;
   } // insertAfter
