@@ -65,7 +65,9 @@ public class BlockChain implements Iterable<Transaction> {
    * @return a new block with correct number, hashes, and such.
    */
   public Block mine(Transaction t) {
-    return new Block(10, t, new Hash(new byte[] {7}), 11); // STUB
+    Hash prevHash = this.last.getValue().getHash();
+    Block newBlock = new Block(this.size, t, prevHash, this.check);
+    return newBlock;
   } // mine(Transaction)
 
   /**
@@ -93,7 +95,7 @@ public class BlockChain implements Iterable<Transaction> {
 
     // (b) the hash is not appropriate for the contents
     Hash temp = new Hash(
-        Block.computeHash(blk.getNum(), blk.getTransaction(), blk.getHash(), blk.getNonce()));
+        Block.computeHash(blk.getNum(), blk.getTransaction(), blk.getPrevHash(), blk.getNonce()));
     if (!blk.getHash().equals(temp)) {
       throw new IllegalArgumentException("The hash is not appropriate for the contents.");
     } // if
