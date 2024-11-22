@@ -1,6 +1,7 @@
 package edu.grinnell.csc207.blockchains;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.HashMap;
 
@@ -141,10 +142,12 @@ public class BlockChain implements Iterable<Transaction> {
    * @throws Exception If things are wrong at any block.
    */
   public boolean isCorrect() {
-    Node1 current = this.first;
-    Node1 prev = null;
-
-    return true;
+    try {
+      this.check();
+      return true;
+    } catch (Exception e) {
+      return false;
+    } // try/catch
   } // isCorrect()
 
   /**
@@ -155,7 +158,32 @@ public class BlockChain implements Iterable<Transaction> {
    * @throws Exception If things are wrong at any block.
    */
   public void check() throws Exception {
-    // STUB
+    Iterator<Block> iterator = this.blocks();
+    while (iterator.hasNext()) {
+      Block current = iterator.next();
+      // (a) the balances are legal/correct at every step
+      if (current.getTransaction().getAmount() > this.balances
+          .get(current.getTransaction().getSource())) {
+        throw new Exception("The balances are not legal/correct at every step.");
+      } // if
+
+      // (b) every block has a correct previous hash field
+      if (!current.getPrevHash().equals(current.getPrevHash())) {
+        throw new Exception("Every block has a correct previous hash field.");
+      } // if
+
+      // (c) every block has a hash that is correct for its contents
+      Hash temp = new Hash(Block.computeHash(current.getNum(), current.getTransaction(),
+          current.getHash(), current.getNonce()));
+      if (!current.getHash().equals(temp)) {
+        throw new Exception("Every block has a hash that is correct for its contents.");
+      } // if
+
+      // (d) every block has a valid hash
+      if (!this.check.isValid(current.getHash())) {
+        throw new Exception("Every block has a valid hash.");
+      } // if
+    } // while
   } // check()
 
   /**
@@ -164,13 +192,13 @@ public class BlockChain implements Iterable<Transaction> {
    * @return an iterator of all the people in the system.
    */
   public Iterator<String> users() {
-    return new Iterator<String>() {int pos;
-      Node1 next;
-      Node1 update;
+    return new Iterator<String>() {
+      private final Iterator<Map.Entry<String, Integer>> iterator = balances.entrySet().iterator();
+      private Map.Entry<String, Integer> currentEntry;
 
       @Override
       public boolean hasNext() {
-        return (pos < size);
+        return iterator.hasNext();
       } // hasNext()
 
       @Override
@@ -178,15 +206,8 @@ public class BlockChain implements Iterable<Transaction> {
         if (!this.hasNext()) {
           throw new NoSuchElementException();
         } // if
-
-        // Identify the node to update
-        this.update = this.next;
-        this.next = this.next.getNext();
-        // Note the movement
-        ++this.pos;
-
-        // And return the value
-        return this.update.getValue().getTransaction().getSource();
+        currentEntry = iterator.next();
+        return currentEntry.getKey();
       } // next()
     };
   } // users()
@@ -251,6 +272,7 @@ public class BlockChain implements Iterable<Transaction> {
       Node1 next;
       Node1 update;
 
+      @Override
       public boolean hasNext() {
         return (pos < size);
       } // hasNext()
