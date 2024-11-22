@@ -85,9 +85,9 @@ public class BlockChainUI {
 
     boolean done = false;
 
-    String source;
-    String target;
-    int amount;
+    String source = "";
+    String target = "";
+    int amount = 0;
 
     while (!done) {
       pen.print("\nCommand: ");
@@ -99,19 +99,26 @@ public class BlockChainUI {
 
       switch (command.toLowerCase()) {
         case "append":
-          pen.printf("Command '%s' is not yet implemented", command);
+          pen.printf("Adding new block...\n", command);
+          chain.append(new Block(chain.getSize(), new Transaction(source, target, amount), chain.getHash(), validator));
+          pen.print("Block appended.");
           break;
 
         case "balance":
-          pen.printf("Command '%s' is not yet implemented", command);
+          pen.printf("" + source + "'s balance: " + chain.balance(source), command);
           break;
 
         case "blocks":
-          pen.printf("Command '%s' is not yet implemented", command);
+          pen.printf("Chain of blocks:\n" + chain.blocks().toString(), command);
           break;
 
         case "check":
-          pen.printf("Command '%s' is not yet implemented", command);
+          pen.printf("Checking validity of blockchain...\n", command);
+          if (chain.isCorrect()) {
+            pen.println("Blockchain is valid.");
+          } else {
+            pen.println("Blockchain is not valid.");
+          } // if/else
           break;
 
         case "help":
@@ -131,15 +138,20 @@ public class BlockChainUI {
           break;
 
         case "remove":
-          pen.printf("Command '%s' is not yet implemented", command);
+          pen.printf("Removing last block entry...\n", command);
+          if (chain.removeLast()) {
+            pen.println("Successfully removed block.");
+          } else {
+            pen.println("Failed to remove block.");
+          } // if/else
           break;
 
         case "transactions":
-          pen.printf("Command '%s' is not yet implemented", command);
+          pen.printf("Chain of transactions:\n" + chain.iterator().toString(), command);
           break;
 
         case "users":
-          pen.printf("Command '%s' is not yet implemented", command);
+          pen.printf("List of users:\n" + chain.users().toString(), command);
           break;
 
         default:
