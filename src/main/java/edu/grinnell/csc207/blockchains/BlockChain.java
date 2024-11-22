@@ -168,6 +168,7 @@ public class BlockChain implements Iterable<Transaction> {
       Node1 next;
       Node1 update;
 
+      @Override
       public boolean hasNext() {
         return (pos < size);
       } // hasNext()
@@ -215,6 +216,7 @@ public class BlockChain implements Iterable<Transaction> {
       Node1 next;
       Node1 update;
 
+      @Override
       public boolean hasNext() {
         return (pos < size);
       } // hasNext()
@@ -242,6 +244,7 @@ public class BlockChain implements Iterable<Transaction> {
    *
    * @return an iterator for all the blocks in the chain.
    */
+  @Override
   public Iterator<Transaction> iterator() {
     return new Iterator<Transaction>() {
       int pos;
