@@ -65,38 +65,40 @@ public class Block {
    * Create a new block from the specified block number, transaction, and previous hash, mining to
    * choose a nonce that meets the requirements of the validator.
    *
-   * @param num The number of the block.
-   * @param transaction The transaction for the block.
-   * @param prevHash The hash of the previous block.
-   * @param check The validator used to check the block.
+   * @param numInput The number of the block.
+   * @param transactionInput The transaction for the block.
+   * @param prevHashInput The hash of the previous block.
+   * @param checkInput The validator used to check the block.
    */
-  public Block(int num, Transaction transaction, Hash prevHash, HashValidator check) {
-    this.blockNum = num;
-    this.transaction = transaction;
-    this.prevHash = prevHash;
+  public Block(int numInput, Transaction transactionInput, Hash prevHashInput,
+      HashValidator checkInput) {
+    this.blockNum = numInput;
+    this.transaction = transactionInput;
+    this.prevHash = prevHashInput;
     long tempNonce = 0;
-    while (!check.isValid(new Hash(computeHash(num, transaction, prevHash, tempNonce)))) {
+    while (!checkInput
+        .isValid(new Hash(computeHash(numInput, transactionInput, prevHashInput, tempNonce)))) {
       Random rand = new Random();
       tempNonce = rand.nextLong();
     } // while
     this.nonce = tempNonce;
-    this.hash = new Hash(computeHash(num, transaction, prevHash, this.nonce));
+    this.hash = new Hash(computeHash(numInput, transactionInput, prevHashInput, this.nonce));
   } // Block(int, Transaction, Hash, HashValidator)
 
   /**
    * Create a new block, computing the hash for the block.
    *
-   * @param num The number of the block.
-   * @param transaction The transaction for the block.
-   * @param prevHash The hash of the previous block.
-   * @param nonce The nonce of the block.
+   * @param numInput The number of the block.
+   * @param transactionInput The transaction for the block.
+   * @param prevHashInput The hash of the previous block.
+   * @param nonceInput The nonce of the block.
    */
-  public Block(int num, Transaction transaction, Hash prevHash, long nonce) {
-    this.blockNum = num;
-    this.transaction = transaction;
-    this.prevHash = prevHash;
-    this.nonce = nonce;
-    this.hash = new Hash(computeHash(num, transaction, prevHash, nonce));
+  public Block(int numInput, Transaction transactionInput, Hash prevHashInput, long nonceInput) {
+    this.blockNum = numInput;
+    this.transaction = transactionInput;
+    this.prevHash = prevHashInput;
+    this.nonce = nonceInput;
+    this.hash = new Hash(computeHash(numInput, transactionInput, prevHashInput, nonceInput));
   } // Block(int, Transaction, Hash, long)
 
   // +---------+-----------------------------------------------------
@@ -105,6 +107,12 @@ public class Block {
 
   /**
    * Compute the hash of the block given all the other info already stored in the block.
+   *
+   * @param num The number of the block.
+   * @param transaction The transaction for the block.
+   * @param prevHash The hash of the previous block.
+   * @param nonce The nonce of the block.
+   * @return The hash of the block.
    */
   static byte[] computeHash(int num, Transaction transaction, Hash prevHash, long nonce) {
     try {

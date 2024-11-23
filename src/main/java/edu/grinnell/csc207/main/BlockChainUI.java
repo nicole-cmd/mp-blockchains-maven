@@ -34,22 +34,21 @@ public class BlockChainUI {
   /**
    * Print out the instructions.
    *
-   * @param pen
-   *   The pen used for printing instructions.
+   * @param pen The pen used for printing instructions.
    */
   public static void instructions(PrintWriter pen) {
     pen.println("""
-      Valid commands:
-        mine: discovers the nonce for a given transaction
-        append: appends a new block onto the end of the chain
-        remove: removes the last block from the end of the chain
-        check: checks that the block chain is valid
-        users: prints a list of users
-        balance: finds a user's balance
-        transactions: prints out the chain of transactions
-        blocks: prints out the chain of blocks (for debugging only)
-        help: prints this list of commands
-        quit: quits the program""");
+        Valid commands:
+          mine: discovers the nonce for a given transaction
+          append: appends a new block onto the end of the chain
+          remove: removes the last block from the end of the chain
+          check: checks that the block chain is valid
+          users: prints a list of users
+          balance: finds a user's balance
+          transactions: prints out the chain of transactions
+          blocks: prints out the chain of blocks (for debugging only)
+          help: prints this list of commands
+          quit: quits the program""");
   } // instructions(PrintWriter)
 
   // +------+--------------------------------------------------------
@@ -59,26 +58,24 @@ public class BlockChainUI {
   /**
    * Run the UI.
    *
-   * @param args
-   *   Command-line arguments (currently ignored).
+   * @param args Command-line arguments (currently ignored).
    */
   public static void main(String[] args) throws Exception {
     PrintWriter pen = new PrintWriter(System.out, true);
     BufferedReader eyes = new BufferedReader(new InputStreamReader(System.in));
 
     // Set up our blockchain.
-    HashValidator validator =
-        (h) -> {
-          if (h.length() < VALIDATOR_BYTES) {
-            return false;
-          } // if
-          for (int v = 0; v < VALIDATOR_BYTES; v++) {
-            if (h.get(v) != 0) {
-              return false;
-            } // if
-          } // for
-          return true;
-        };
+    HashValidator validator = (h) -> {
+      if (h.length() < VALIDATOR_BYTES) {
+        return false;
+      } // if
+      for (int v = 0; v < VALIDATOR_BYTES; v++) {
+        if (h.get(v) != 0) {
+          return false;
+        } // if
+      } // for
+      return true;
+    };
     BlockChain chain = new BlockChain(validator);
 
     instructions(pen);
@@ -100,7 +97,8 @@ public class BlockChainUI {
       switch (command.toLowerCase()) {
         case "append":
           pen.printf("Adding new block...\n", command);
-          chain.append(new Block(chain.getSize(), new Transaction(source, target, amount), chain.getHash(), validator));
+          chain.append(new Block(chain.getSize(), new Transaction(source, target, amount),
+              chain.getHash(), validator));
           pen.print("Block appended.");
           break;
 

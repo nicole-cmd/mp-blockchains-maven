@@ -48,14 +48,14 @@ public class BlockChain implements Iterable<Transaction> {
   /**
    * Create a new blockchain using a validator to check elements.
    *
-   * @param check The validator used to check elements.
+   * @param checkInput The validator used to check elements.
    */
   @SuppressWarnings({"rawtypes", "unchecked"})
-  public BlockChain(HashValidator check) {
-    this.check = check;
+  public BlockChain(HashValidator checkInput) {
+    this.check = checkInput;
     Transaction t = new Transaction("", "", 0);
     Hash h = new Hash(new byte[] {});
-    Block firstBlock = new Block(0, t, h, check);
+    Block firstBlock = new Block(0, t, h, checkInput);
     this.first = new Node1(firstBlock);
     this.last = this.first;
     this.size = 1;
@@ -156,7 +156,8 @@ public class BlockChain implements Iterable<Transaction> {
     Node1 current = this.first;
     while (current.next != this.last) {
       current = current.next;
-    }
+    } // while
+
     // Remove the last node
     current.next = null;
     this.last = current;
@@ -178,6 +179,7 @@ public class BlockChain implements Iterable<Transaction> {
    * step, (b) that every block has a correct previous hash field, (c) that every block has a hash
    * that is correct for its contents, and (d) that every block has a valid hash.
    *
+   * @return true if the blockchain is correct and false otherwise.
    * @throws Exception If things are wrong at any block.
    */
   public boolean isCorrect() {

@@ -3,9 +3,8 @@ package edu.grinnell.csc207.blockchains;
 /**
  * Nodes for singly-linked structures.
  *
- * @author
- *
- * @param <T> The type of value stored in the nodes (and structures built from the nodes).
+ * @author Khanh Do
+ * @author Nicole Gorrell
  */
 public class Node1 {
   // +--------+------------------------------------------------------
@@ -41,7 +40,6 @@ public class Node1 {
    * Create a new node with no next link (e.g., if it's at the end of the list). Included primarily
    * for symmetry.
    *
-   * @param prevNode The previous node in the list (or null, if it's the front of the list).
    * @param val The value to be stored in the node.
    */
   public Node1(Block val) {
