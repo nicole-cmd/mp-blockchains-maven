@@ -1,6 +1,4 @@
-package edu.grinnell.csc207.util;
-
-import edu.grinnell.csc207.blockchains.Block;
+package edu.grinnell.csc207.blockchains;
 
 /**
  * Nodes for singly-linked structures.
@@ -64,15 +62,6 @@ public class Node1 {
   } // getValue()
 
   /**
-   * Get the next node.
-   *
-   * @return the next node.
-   */
-  public Node1 getNext() {
-    return this.next;
-  } // getNext()
-
-  /**
    * Insert a new value after this node.
    *
    * @param val The value to insert.
@@ -84,20 +73,8 @@ public class Node1 {
       tmp = new Node1(val);
     } else {
       tmp = new Node1(val, this.next);
-    }
+    } // if/else
     this.next = tmp;
     return tmp;
   } // insertAfter
-
-  /**
-   * Remove this node.
-   */
-  public void remove() {
-    if (this.next == null) {
-      this.value = null;
-    } else {
-      this.value = this.next.value;
-      this.next = this.next.next;
-    } // if/else
-  } // remove()
 } // Node1<Block>

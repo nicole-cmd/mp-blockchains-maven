@@ -61,28 +61,24 @@ public class TestBlockChain {
       // Do nothing; we expect this.
     } // try/catch
   } // assertCheckFails(BlockChain, String)
-  
+
   // +-------+-------------------------------------------------------
   // | Tests |
   // +-------+
 
   /**
-   * If we create a new blockchain with a custom validator, is
-   * the hash of the first block valid?
+   * If we create a new blockchain with a custom validator, is the hash of the first block valid?
    */
   @Test
   public void testValidateInitial() {
-    HashValidator v = 
-        (hash) -> 
-            (hash.length() >= 2) && (hash.get(0) == 1) && (hash.get(1) == 2);
+    HashValidator v = (hash) -> (hash.length() >= 2) && (hash.get(0) == 1) && (hash.get(1) == 2);
     BlockChain chain = new BlockChain(v);
-    assertTrue(v.isValid(chain.getHash()),
-        "initial block in newly-created blockchain is valid");
+    assertTrue(v.isValid(chain.getHash()), "initial block in newly-created blockchain is valid");
   } // testValidateInitial
 
   /**
-   * If we try to remove the last element from a block chain with only
-   * one element, `remove` will return false.
+   * If we try to remove the last element from a block chain with only one element, `remove` will
+   * return false.
    */
   @Test
   public void testRemoveInitial() {
@@ -97,20 +93,14 @@ public class TestBlockChain {
    */
   @Test
   public void testMine() {
-    HashValidator v = 
-        (hash) -> 
-            (hash.length() >= 2) && (hash.get(0) == 2) && (hash.get(1) == 2);
+    HashValidator v = (hash) -> (hash.length() >= 2) && (hash.get(0) == 2) && (hash.get(1) == 2);
     BlockChain chain = new BlockChain(v);
     Block block = chain.mine(new Transaction("Here", "There", 123));
     assertTrue(v.isValid(block.getHash()), "Check hash of newly mined block");
-    assertEquals("Here", block.getTransaction().getSource(),
-        "Check source of newly mined block");
-    assertEquals("There", block.getTransaction().getTarget(),
-        "Check target of newly mined block");
-    assertEquals(123, block.getTransaction().getAmount(),
-        "Check amount of newly mined block");
-    assertEquals(chain.getHash(), block.getPrevHash(),
-        "Check prevHash of newly mined block");
+    assertEquals("Here", block.getTransaction().getSource(), "Check source of newly mined block");
+    assertEquals("There", block.getTransaction().getTarget(), "Check target of newly mined block");
+    assertEquals(123, block.getTransaction().getAmount(), "Check amount of newly mined block");
+    assertEquals(chain.getHash(), block.getPrevHash(), "Check prevHash of newly mined block");
   } // testMine()
 
   /**
@@ -118,9 +108,7 @@ public class TestBlockChain {
    */
   @Test
   public void testAppend() {
-    HashValidator v = 
-        (hash) -> 
-            (hash.length() >= 2) && (hash.get(0) == 2) && (hash.get(1) == 1);
+    HashValidator v = (hash) -> (hash.length() >= 2) && (hash.get(0) == 2) && (hash.get(1) == 1);
     BlockChain chain = new BlockChain(v);
     Block block1 = chain.mine(new Transaction("", "A", 4321));
     chain.append(block1);
@@ -138,9 +126,7 @@ public class TestBlockChain {
    */
   @Test
   public void testIterateBlocks() {
-    HashValidator v = 
-        (hash) -> 
-            (hash.length() >= 2) && (hash.get(0) == 1) && (hash.get(1) == 3);
+    HashValidator v = (hash) -> (hash.length() >= 2) && (hash.get(0) == 1) && (hash.get(1) == 3);
     BlockChain chain = new BlockChain(v);
     Block block1 = chain.mine(new Transaction("", "A", 4321));
     chain.append(block1);
@@ -166,9 +152,7 @@ public class TestBlockChain {
    */
   @Test
   public void testRemoveBlocks() {
-    HashValidator v = 
-        (hash) -> 
-            (hash.length() >= 2) && (hash.get(0) == 2) && (hash.get(1) == 3);
+    HashValidator v = (hash) -> (hash.length() >= 2) && (hash.get(0) == 2) && (hash.get(1) == 3);
     BlockChain chain = new BlockChain(v);
     Block block1 = chain.mine(new Transaction("", "A", 4321));
     chain.append(block1);
@@ -192,9 +176,7 @@ public class TestBlockChain {
    */
   @Test
   public void testRemoveAndAppendBlocks() {
-    HashValidator v = 
-        (hash) -> 
-            (hash.length() >= 2) && (hash.get(0) == 3) && (hash.get(1) == 3);
+    HashValidator v = (hash) -> (hash.length() >= 2) && (hash.get(0) == 3) && (hash.get(1) == 3);
     BlockChain chain = new BlockChain(v);
     Block block1 = chain.mine(new Transaction("", "A", 4321));
     chain.append(block1);
@@ -233,9 +215,7 @@ public class TestBlockChain {
    */
   @Test
   public void testBalances() {
-    HashValidator v = 
-        (hash) -> 
-            (hash.length() >= 2) && (hash.get(0) == 64) && (hash.get(1) == 64);
+    HashValidator v = (hash) -> (hash.length() >= 2) && (hash.get(0) == 64) && (hash.get(1) == 64);
     BlockChain chain = new BlockChain(v);
     assertEquals(0, chain.balance("A"), "A's initial balance");
     assertEquals(0, chain.balance("B"), "B's initial balance");
@@ -245,7 +225,7 @@ public class TestBlockChain {
     assertEquals(100, chain.balance("A"), "A's second balance");
     assertEquals(0, chain.balance("B"), "B's second balance");
     assertEquals(0, chain.balance("C"), "C's second balance");
-    
+
     chain.removeLast();
     assertEquals(0, chain.balance("A"), "A's third balance");
     assertEquals(0, chain.balance("B"), "B's third balance");
@@ -282,9 +262,7 @@ public class TestBlockChain {
    */
   @Test
   public void testUsers() {
-    HashValidator v = 
-        (hash) -> 
-            (hash.length() >= 2) && (hash.get(0) == 64) && (hash.get(1) == 64);
+    HashValidator v = (hash) -> (hash.length() >= 2) && (hash.get(0) == 64) && (hash.get(1) == 64);
     BlockChain chain = new BlockChain(v);
 
     assertArrayEquals(new String[] {}, users(chain), "No users");
@@ -299,30 +277,26 @@ public class TestBlockChain {
     assertArrayEquals(new String[] {"B", "C", "D"}, users(chain), "B-D");
 
     chain.append(chain.mine(new Transaction("B", "C", 10)));
-    assertArrayEquals(new String[] {"B", "C", "D"}, users(chain), 
+    assertArrayEquals(new String[] {"B", "C", "D"}, users(chain),
         "A-D, with extra C (not a different user)");
 
     chain.append(chain.mine(new Transaction("C", "D", 10)));
-    assertArrayEquals(new String[] {"B", "C", "D"}, users(chain), 
-        "B-D, with extra C and D");
+    assertArrayEquals(new String[] {"B", "C", "D"}, users(chain), "B-D, with extra C and D");
 
     chain.append(chain.mine(new Transaction("D", "E", 10)));
-    assertArrayEquals(new String[] {"B", "C", "D", "E"}, users(chain), 
-        "B-E, with extra C and D");
+    assertArrayEquals(new String[] {"B", "C", "D", "E"}, users(chain), "B-E, with extra C and D");
 
     chain.append(chain.mine(new Transaction("B", "A", 10)));
-    assertArrayEquals(new String[] {"A", "B", "C", "D", "E"}, users(chain), 
+    assertArrayEquals(new String[] {"A", "B", "C", "D", "E"}, users(chain),
         "A-E, with extra C and D");
   } // testUsers()
 
   /**
    * Test a long valid sequence.
    */
-  @Test 
+  @Test
   public void testValidityValid() throws Exception {
-    HashValidator v = 
-        (hash) -> 
-            (hash.length() >= 2) && (hash.get(0) == 0) && (hash.get(1) == 32);
+    HashValidator v = (hash) -> (hash.length() >= 2) && (hash.get(0) == 0) && (hash.get(1) == 32);
     BlockChain chain = new BlockChain(v);
 
     assertTrue(chain.isCorrect());
@@ -352,11 +326,9 @@ public class TestBlockChain {
   /**
    * Test append of bad blocks.
    */
-  @Test 
+  @Test
   public void testAppendBad() throws Exception {
-    HashValidator v = 
-        (hash) -> 
-            (hash.length() >= 2) && (hash.get(0) == 7) && (hash.get(1) == 11);
+    HashValidator v = (hash) -> (hash.length() >= 2) && (hash.get(0) == 7) && (hash.get(1) == 11);
     BlockChain chain = new BlockChain(v);
 
     assertTrue(chain.isCorrect());
@@ -380,9 +352,7 @@ public class TestBlockChain {
    */
   @Test
   public void testInvalidTransactions() throws Exception {
-    HashValidator v = 
-        (hash) -> 
-            (hash.length() >= 2) && (hash.get(0) == 10) && (hash.get(1) == 10);
+    HashValidator v = (hash) -> (hash.length() >= 2) && (hash.get(0) == 10) && (hash.get(1) == 10);
     BlockChain chain = new BlockChain(v);
 
     // Set up a valid chain of transactions
@@ -443,9 +413,7 @@ public class TestBlockChain {
    */
   @Test
   public void testModifiedChain() throws Exception {
-    HashValidator v = 
-        (hash) -> 
-            (hash.length() >= 2) && (hash.get(0) == 11) && (hash.get(1) == 11);
+    HashValidator v = (hash) -> (hash.length() >= 2) && (hash.get(0) == 11) && (hash.get(1) == 11);
     BlockChain chain = new BlockChain(v);
 
     chain.append(chain.mine(new Transaction("", "F", 100)));
@@ -462,5 +430,4 @@ public class TestBlockChain {
     assertFalse(chain.isCorrect(), "modified chain is incorrect");
     assertCheckFails(chain, "modified chain is incorrect");
   } // testModifiedChain()
-
 } // class TestBlockChain
