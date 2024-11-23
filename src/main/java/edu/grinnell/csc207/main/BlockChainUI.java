@@ -3,6 +3,7 @@ package edu.grinnell.csc207.main;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.Iterator;
 
 import edu.grinnell.csc207.blockchains.Block;
 import edu.grinnell.csc207.blockchains.BlockChain;
@@ -60,6 +61,7 @@ public class BlockChainUI {
    *
    * @param args Command-line arguments (currently ignored).
    */
+  @SuppressWarnings("ConvertToTryWithResources")
   public static void main(String[] args) throws Exception {
     PrintWriter pen = new PrintWriter(System.out, true);
     BufferedReader eyes = new BufferedReader(new InputStreamReader(System.in));
@@ -96,26 +98,38 @@ public class BlockChainUI {
 
       switch (command.toLowerCase()) {
         case "append":
-          pen.printf("Adding new block...\n", command);
-          chain.append(new Block(chain.getSize(), new Transaction(source, target, amount),
-              chain.getHash(), validator));
-          pen.print("Block appended.");
+          Block toAppend = new Block(chain.getSize(), new Transaction(source, target, amount),
+              chain.getHash(), validator);
+          chain.append(toAppend);
+
+          pen.println("Source (return for deposit): " + source);
+          pen.println("Target: " + target);
+          pen.println("Amount: " + amount);
+          pen.println("Nonce: " + toAppend.getNonce());
+          pen.println("Appended: " + toAppend.toString());
           break;
 
         case "balance":
-          pen.printf("" + source + "'s balance: " + chain.balance(source), command);
+          Iterator<String> userIter2 = chain.users();
+          while (userIter2.hasNext()) {
+            String user = userIter2.next();
+            pen.println("User: " + user);
+            pen.println(user + "'s balance is " + chain.balance(user));
+          } // while
           break;
 
         case "blocks":
-          pen.printf("Chain of blocks:\n" + chain.blocks().toString(), command);
+          Iterator<Block> iter = chain.blocks();
+          while (iter.hasNext()) {
+            pen.println(iter.next().toString());
+          } // while
           break;
 
         case "check":
-          pen.printf("Checking validity of blockchain...\n", command);
           if (chain.isCorrect()) {
-            pen.println("Blockchain is valid.");
+            pen.println("The blockchain checks out.");
           } else {
-            pen.println("Blockchain is not valid.");
+            pen.println("The blockchain does NOT check out.");
           } // if/else
           break;
 
@@ -128,7 +142,7 @@ public class BlockChainUI {
           target = IOUtils.readLine(pen, eyes, "Target: ");
           amount = IOUtils.readInt(pen, eyes, "Amount: ");
           Block b = chain.mine(new Transaction(source, target, amount));
-          pen.println("Nonce: " + b.getNonce());
+          pen.println("\nUse nonce: " + b.getNonce());
           break;
 
         case "quit":
@@ -145,11 +159,20 @@ public class BlockChainUI {
           break;
 
         case "transactions":
-          pen.printf("Chain of transactions:\n" + chain.iterator().toString(), command);
+          Iterator<Transaction> transIter = chain.iterator();
+          if (transIter.hasNext()) {
+            transIter.next(); // Skip the first transaction
+          } // if
+          while (transIter.hasNext()) {
+            pen.println(transIter.next().toString());
+          } // while
           break;
 
         case "users":
-          pen.printf("List of users:\n" + chain.users().toString(), command);
+          Iterator<String> userIter = chain.users();
+          while (userIter.hasNext()) {
+            pen.println(userIter.next());
+          } // while
           break;
 
         default:

@@ -338,8 +338,7 @@ public class BlockChain implements Iterable<Transaction> {
   public Iterator<Transaction> iterator() {
     return new Iterator<Transaction>() {
       int pos = 0;
-      Node1 next;
-      Node1 update;
+      Node1 next = first;
 
       @Override
       public boolean hasNext() {
@@ -351,15 +350,10 @@ public class BlockChain implements Iterable<Transaction> {
         if (!this.hasNext()) {
           throw new NoSuchElementException();
         } // if
-
-        // Identify the node to update
-        this.update = this.next;
+        Node1 current = this.next;
         this.next = this.next.next;
-        // Note the movement
         ++this.pos;
-
-        // And return the value
-        return this.update.getValue().getTransaction();
+        return current.getValue().getTransaction();
       } // next()
     };
   } // iterator()

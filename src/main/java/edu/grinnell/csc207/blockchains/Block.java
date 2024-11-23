@@ -75,10 +75,10 @@ public class Block {
     this.blockNum = numInput;
     this.transaction = transactionInput;
     this.prevHash = prevHashInput;
-    long tempNonce = 0;
+    Random rand = new Random();
+    long tempNonce = rand.nextLong();
     while (!checkInput
         .isValid(new Hash(computeHash(numInput, transactionInput, prevHashInput, tempNonce)))) {
-      Random rand = new Random();
       tempNonce = rand.nextLong();
     } // while
     this.nonce = tempNonce;
@@ -220,7 +220,7 @@ public class Block {
 
     str.append("Block " + getNum() + " (Transaction: [");
     if (this.transaction.getSource().equals("")) {
-      str.append("Deposit ");
+      str.append("Deposit");
     } else {
       str.append("Source: " + this.transaction.getSource());
     } // if/else
