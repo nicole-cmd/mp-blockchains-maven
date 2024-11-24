@@ -10,6 +10,8 @@ import edu.grinnell.csc207.blockchains.BlockChain;
 import edu.grinnell.csc207.blockchains.HashValidator;
 import edu.grinnell.csc207.blockchains.Transaction;
 import edu.grinnell.csc207.util.IOUtils;
+import edu.grinnell.csc207.blockchains.Hash;
+import edu.grinnell.csc207.blockchains.Node1;
 
 /**
  * A simple UI for our BlockChain class.
@@ -86,7 +88,11 @@ public class BlockChainUI {
 
     String source = "";
     String target = "";
+    String user = "";
     int amount = 0;
+    int mineCount = 1;
+    Block minedBlock = new Block(chain.getSize(), new Transaction(source, target, amount),
+                                 new Hash(new byte[] {}), validator);
 
     while (!done) {
       pen.print("\nCommand: ");
@@ -98,24 +104,25 @@ public class BlockChainUI {
 
       switch (command.toLowerCase()) {
         case "append":
+          source = IOUtils.readLine(pen, eyes, "Source (return for deposit): ");
+          target = IOUtils.readLine(pen, eyes, "Target: ");
+          amount = IOUtils.readInt(pen, eyes, "Amount: ");
           Block toAppend = new Block(chain.getSize(), new Transaction(source, target, amount),
-              chain.getHash(), validator);
-          chain.append(toAppend);
+              chain.getHash(), minedBlock.getNonce());
+          pen.println("Nonce: " + minedBlock.getNonce());
 
-          pen.println("Source (return for deposit): " + source);
-          pen.println("Target: " + target);
-          pen.println("Amount: " + amount);
-          pen.println("Nonce: " + toAppend.getNonce());
+          if (!(mineCount == chain.getSize() + 1)
+              || !(minedBlock.getTransaction().equals(toAppend.getTransaction()))) {
+            pen.println("Could not append: Invalid hash in appended block: " + toAppend.getHash());
+            break;
+          } // if
+          chain.append(toAppend);
           pen.println("Appended: " + toAppend.toString());
           break;
 
         case "balance":
-          Iterator<String> userIter2 = chain.users();
-          while (userIter2.hasNext()) {
-            String user = userIter2.next();
-            pen.println("User: " + user);
-            pen.println(user + "'s balance is " + chain.balance(user));
-          } // while
+          user = IOUtils.readLine(pen, eyes, "User: ");
+          pen.println(user + "'s balance is " + chain.balance(user));
           break;
 
         case "blocks":
@@ -126,6 +133,28 @@ public class BlockChainUI {
           break;
 
         case "check":
+          Node1 current = chain.getCurrent();
+          Node1 next = chain.getNext();
+          while (current != null && next != null) {
+            if (!(current.getValue().getTransaction().getTarget()).equals(
+                  next.getValue().getTransaction().getSource())) {
+              pen.println("Unknown source in block " + next.getValue().getNum() + ": \""
+                          + current.getValue().getTransaction().getSource() + "\"");
+            } else if (current.getValue().getTransaction().getAmount()
+                       < next.getValue().getTransaction().getAmount()) {
+              pen.println("Insufficient balance for"
+                          + current.getValue().getTransaction().getSource()
+                          + "in block" + next.getValue().getNum() + ": Has"
+                          + current.getValue().getTransaction().getAmount()
+                          + ", needs " + next.getValue().getTransaction().getAmount());
+            } else if (current.getValue().getTransaction().getAmount() < 0) {
+              pen.println("Negative amount in block" + current.getValue().getNum() + ": "
+                          + current.getValue().getTransaction().getAmount());
+            } // if/elif/elif
+            current = next;
+            next = chain.getNext();
+          } // while
+
           if (chain.isCorrect()) {
             pen.println("The blockchain checks out.");
           } else {
@@ -141,8 +170,9 @@ public class BlockChainUI {
           source = IOUtils.readLine(pen, eyes, "Source (return for deposit): ");
           target = IOUtils.readLine(pen, eyes, "Target: ");
           amount = IOUtils.readInt(pen, eyes, "Amount: ");
-          Block b = chain.mine(new Transaction(source, target, amount));
-          pen.println("\nUse nonce: " + b.getNonce());
+          minedBlock = chain.mine(new Transaction(source, target, amount));
+          pen.println("\nUse nonce: " + minedBlock.getNonce());
+          mineCount++;
           break;
 
         case "quit":

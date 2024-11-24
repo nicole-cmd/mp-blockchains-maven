@@ -67,6 +67,25 @@ public class BlockChain implements Iterable<Transaction> {
   // | Helpers |
   // +---------+
 
+  /**
+   * Get the current node of the block, used to cycle through each
+   * block in the blockchain.
+   *
+   * @return the specified node from the blockchain.
+   */
+  public Node1 getCurrent() {
+    return this.first;
+  } // getCurrent()
+
+  /**
+   * Get the next node of the current block.
+   *
+   * @return the node following the specified node.
+   */
+  public Node1 getNext() {
+    return this.first.next;
+  } // getCurrent()
+
   // +---------+-----------------------------------------------------
   // | Methods |
   // +---------+
