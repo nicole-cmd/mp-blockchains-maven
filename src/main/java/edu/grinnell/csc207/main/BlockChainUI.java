@@ -176,7 +176,7 @@ public class BlockChainUI {
         case "transactions":
           Iterator<Transaction> transIter = chain.iterator();
           if (transIter.hasNext()) {
-            transIter.next(); // Skip the first transaction
+            transIter.next();
           } // if
           while (transIter.hasNext()) {
             pen.println(transIter.next().toString());

@@ -229,15 +229,24 @@ public class BlockChain implements Iterable<Transaction> {
   public void check() throws Exception {
     Node1 prev = this.first;
     Node1 current = this.first.next;
+
     Map<String, Integer> computedBalances = new HashMap<>();
+
     int maxIterations = size;
     int count = 0;
+
     while (current != null) {
       if (++count > maxIterations) {
         throw new Exception("Infinite loop detected in blockchain.");
       } // if
+
       Block currentBlock = current.getValue();
       Transaction transaction = currentBlock.getTransaction();
+      String target = transaction.getTarget();
+      String source = transaction.getSource();
+      int sourceBalance = computedBalances.getOrDefault(source, 0);
+      int amount = transaction.getAmount();
+      int blockNum = currentBlock.getNum();
 
       // (a) Verify balances
       if (transaction.getAmount() < 0) {
@@ -246,23 +255,21 @@ public class BlockChain implements Iterable<Transaction> {
       } // if
 
       if (!transaction.getSource().isEmpty()) {
-        int sourceBalance = computedBalances.getOrDefault(transaction.getSource(), 0);
-        if (!computedBalances.containsKey(transaction.getSource())) {
-          throw new Exception("Unknown source in block " + currentBlock.getNum() + ": \""
-              + transaction.getSource() + "\"");
+        if (!computedBalances.containsKey(source)) {
+          throw new Exception("Unknown source in block " + blockNum + ": \"" + source + "\"");
         } // if
+
         if (sourceBalance < transaction.getAmount()) {
-          throw new Exception("Insufficient balance for " + transaction.getSource() + " in block "
-              + currentBlock.getNum() + ": Has " + sourceBalance + ", needs "
-              + transaction.getAmount());
+          throw new Exception("Insufficient balance for " + source + " in block " + blockNum
+              + ": Has " + sourceBalance + ", needs " + amount);
         } // if
+
         // Deduct from the source
-        computedBalances.put(transaction.getSource(), sourceBalance - transaction.getAmount());
+        computedBalances.put(source, sourceBalance - amount);
       } // if
 
       // Add to the target
-      computedBalances.put(transaction.getTarget(),
-          computedBalances.getOrDefault(transaction.getTarget(), 0) + transaction.getAmount());
+      computedBalances.put(target, computedBalances.getOrDefault(target, 0) + amount);
 
       // (b) that every block has a correct previous hash field
       if (prev != null && !currentBlock.getPrevHash().equals(prev.getValue().getHash())) {
@@ -270,8 +277,8 @@ public class BlockChain implements Iterable<Transaction> {
       } // if
 
       // (c) that every block has a hash that is correct for its contents
-      Hash temp = new Hash(Block.computeHash(currentBlock.getNum(), transaction,
-          currentBlock.getPrevHash(), currentBlock.getNonce()));
+      Hash temp = new Hash(Block.computeHash(blockNum, transaction, currentBlock.getPrevHash(),
+          currentBlock.getNonce()));
       if (!currentBlock.getHash().equals(temp)) {
         throw new Exception("Every block does not have a hash that is correct for its contents.");
       } // if
