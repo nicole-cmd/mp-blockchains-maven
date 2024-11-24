@@ -57,9 +57,6 @@ public class BlockChainUI {
   // | Main |
   // +------+
 
-  // Note: This SuppressWarnings produces a checkstyle violation,
-  // but we were provided this.
-
   /**
    * Run the UI.
    *
@@ -144,7 +141,7 @@ public class BlockChainUI {
             pen.println("The blockchain checks out.");
           } catch (Exception e) {
             pen.println(e.getMessage());
-          } // while
+          } // try/catch
           break;
 
         case "help":

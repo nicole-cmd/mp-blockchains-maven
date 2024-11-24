@@ -154,12 +154,6 @@ public class Block {
     return intBuffer.putInt(i).array();
   } // intToBytes(int)
 
-  // /**
-  // * Generate nonce numbers.
-  // */
-  // static long generateNonce() {
-
-  // } // generateNonce()
   // +---------+-----------------------------------------------------
   // | Methods |
   // +---------+
