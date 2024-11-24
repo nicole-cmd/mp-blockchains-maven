@@ -68,8 +68,7 @@ public class BlockChain implements Iterable<Transaction> {
   // +---------+
 
   /**
-   * Get the current node of the block, used to cycle through each
-   * block in the blockchain.
+   * Get the current node of the block, used to cycle through each block in the blockchain.
    *
    * @return the specified node from the blockchain.
    */
@@ -194,6 +193,16 @@ public class BlockChain implements Iterable<Transaction> {
   } // getHash()
 
   /**
+   * Determine if a user is in the system.
+   *
+   * @param user The user to check.
+   * @return true if the user is in the system and false otherwise.
+   */
+  public boolean isUserInSystem(String user) {
+    return balances.containsKey(user);
+  } // isUserInSystem()
+
+  /**
    * Determine if the blockchain is correct in that (a) the balances are legal/correct at every
    * step, (b) that every block has a correct previous hash field, (c) that every block has a hash
    * that is correct for its contents, and (d) that every block has a valid hash.
@@ -232,13 +241,20 @@ public class BlockChain implements Iterable<Transaction> {
 
       // (a) Verify balances
       if (transaction.getAmount() < 0) {
-        throw new Exception("Transaction amount is negative.");
+        throw new Exception(
+            "Negative amount in block " + currentBlock.getNum() + ": " + transaction.getAmount());
       } // if
 
       if (!transaction.getSource().isEmpty()) {
         int sourceBalance = computedBalances.getOrDefault(transaction.getSource(), 0);
+        if (!computedBalances.containsKey(transaction.getSource())) {
+          throw new Exception("Unknown source in block " + currentBlock.getNum() + ": \""
+              + transaction.getSource() + "\"");
+        } // if
         if (sourceBalance < transaction.getAmount()) {
-          throw new Exception("Insufficient balance for source: " + transaction.getSource());
+          throw new Exception("Insufficient balance for " + transaction.getSource() + " in block "
+              + currentBlock.getNum() + ": Has " + sourceBalance + ", needs "
+              + transaction.getAmount());
         } // if
         // Deduct from the source
         computedBalances.put(transaction.getSource(), sourceBalance - transaction.getAmount());
@@ -318,7 +334,6 @@ public class BlockChain implements Iterable<Transaction> {
     } // while
     return balance;
   } // balance(String)
-
 
   /**
    * Get an interator for all the blocks in the chain.

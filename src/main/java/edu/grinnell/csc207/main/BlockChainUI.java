@@ -7,11 +7,10 @@ import java.util.Iterator;
 
 import edu.grinnell.csc207.blockchains.Block;
 import edu.grinnell.csc207.blockchains.BlockChain;
+import edu.grinnell.csc207.blockchains.Hash;
 import edu.grinnell.csc207.blockchains.HashValidator;
 import edu.grinnell.csc207.blockchains.Transaction;
 import edu.grinnell.csc207.util.IOUtils;
-import edu.grinnell.csc207.blockchains.Hash;
-import edu.grinnell.csc207.blockchains.Node1;
 
 /**
  * A simple UI for our BlockChain class.
@@ -95,7 +94,7 @@ public class BlockChainUI {
     int amount = 0;
     int mineCount = 1;
     Block minedBlock = new Block(chain.getSize(), new Transaction(source, target, amount),
-                                 new Hash(new byte[] {}), validator);
+        new Hash(new byte[] {}), validator);
 
     while (!done) {
       pen.print("\nCommand: ");
@@ -111,7 +110,7 @@ public class BlockChainUI {
           target = IOUtils.readLine(pen, eyes, "Target: ");
           amount = IOUtils.readInt(pen, eyes, "Amount: ");
           Block toAppend = new Block(chain.getSize(), new Transaction(source, target, amount),
-                                     chain.getHash(), minedBlock.getNonce());
+              chain.getHash(), minedBlock.getNonce());
           pen.println("Nonce: " + toAppend.getNonce());
 
           if (!(mineCount == chain.getSize() + 1)
@@ -125,7 +124,11 @@ public class BlockChainUI {
 
         case "balance":
           user = IOUtils.readLine(pen, eyes, "User: ");
-          pen.println(user + "'s balance is " + chain.balance(user));
+          if (chain.isUserInSystem(user)) {
+            pen.println(user + "'s balance is " + chain.balance(user));
+          } else {
+            pen.println("User not found");
+          } // if/else
           break;
 
         case "blocks":
@@ -138,36 +141,10 @@ public class BlockChainUI {
         case "check":
           try {
             chain.check();
-          } catch (Exception e) {
-            Node1 current = chain.getNextBlk();
-
-            while (!(current == null)) {
-              Block currentBlock = current.getValue();
-              Transaction currentTransaction = current.getValue().getTransaction();
-
-              if (chain.balance(currentTransaction.getSource()) < 0) {
-                pen.println("Unknown source in block " + currentBlock.getNum() + ": \""
-                            + currentTransaction.getSource() + "\"");
-                break;
-              } else if (e.getMessage().contains("negative")) {
-                pen.println("Negative amount in block " + currentBlock.getNum() + ": "
-                            + currentTransaction.getAmount());
-                break;
-              } else if (e.getMessage().contains("Insufficient")) {
-                pen.println("Insufficient balance for " + currentTransaction.getTarget()
-                            + " in block " + currentBlock.getNum() + ": Has "
-                            + chain.balance(currentTransaction.getTarget()) + ", needs "
-                            + currentTransaction.getAmount());
-                break;
-              } // if/else
-
-              current = chain.getNextBlk().getNext().getNext();
-            } // while
-          } // try/catch
-
-          if (chain.isCorrect()) {
             pen.println("The blockchain checks out.");
-          } // if
+          } catch (Exception e) {
+            pen.println(e.getMessage());
+          } // while
           break;
 
         case "help":
@@ -189,9 +166,9 @@ public class BlockChainUI {
 
         case "remove":
           if (chain.removeLast()) {
-            pen.println("Successfully removed last block.");
+            pen.println("Removed last element");
           } else {
-            pen.println("Failed to remove last block.");
+            pen.println("Can't remove");
           } // if/else
           mineCount--;
           break;
