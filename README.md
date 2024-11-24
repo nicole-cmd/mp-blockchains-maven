@@ -10,6 +10,6 @@ Authors
 
 Acknowledgements
 
-- _Forthcoming_.
+- "What are the different ways to print an exception message in Java?" (https://www.tutorialspoint.com/what-are-the-different-ways-to-print-an-exception-message-in-java)
 
 This code may be found at <https://github.com/nicole-cmd/mp-blockchains-maven>. The original code may be found at <https://github.com/Grinnell-CSC207/mp-blockchinas-maven>.
