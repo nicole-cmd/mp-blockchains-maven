@@ -75,4 +75,13 @@ public class Node1 {
     this.next = tmp;
     return tmp;
   } // insertAfter
+
+  /**
+   * Get the next node in the list.
+   *
+   * @return the next node.
+   */
+  public Node1 getNext() {
+    return this.next;
+  } // getNext()
 } // Node1<Block>

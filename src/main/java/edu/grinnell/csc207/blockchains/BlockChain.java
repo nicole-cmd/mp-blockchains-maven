@@ -82,7 +82,7 @@ public class BlockChain implements Iterable<Transaction> {
    *
    * @return the node following the specified node.
    */
-  public Node1 getNext() {
+  public Node1 getNextBlk() {
     return this.first.next;
   } // getCurrent()
 

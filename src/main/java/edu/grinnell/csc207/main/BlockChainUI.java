@@ -58,6 +58,9 @@ public class BlockChainUI {
   // | Main |
   // +------+
 
+  // Note: This SuppressWarnings produces a checkstyle violation,
+  // but we were provided this.
+
   /**
    * Run the UI.
    *
@@ -108,8 +111,8 @@ public class BlockChainUI {
           target = IOUtils.readLine(pen, eyes, "Target: ");
           amount = IOUtils.readInt(pen, eyes, "Amount: ");
           Block toAppend = new Block(chain.getSize(), new Transaction(source, target, amount),
-              chain.getHash(), minedBlock.getNonce());
-          pen.println("Nonce: " + minedBlock.getNonce());
+                                     chain.getHash(), minedBlock.getNonce());
+          pen.println("Nonce: " + toAppend.getNonce());
 
           if (!(mineCount == chain.getSize() + 1)
               || !(minedBlock.getTransaction().equals(toAppend.getTransaction()))) {
@@ -133,33 +136,38 @@ public class BlockChainUI {
           break;
 
         case "check":
-          Node1 current = chain.getCurrent();
-          Node1 next = chain.getNext();
-          while (current != null && next != null) {
-            if (!(current.getValue().getTransaction().getTarget()).equals(
-                  next.getValue().getTransaction().getSource())) {
-              pen.println("Unknown source in block " + next.getValue().getNum() + ": \""
-                          + current.getValue().getTransaction().getSource() + "\"");
-            } else if (current.getValue().getTransaction().getAmount()
-                       < next.getValue().getTransaction().getAmount()) {
-              pen.println("Insufficient balance for"
-                          + current.getValue().getTransaction().getSource()
-                          + "in block" + next.getValue().getNum() + ": Has"
-                          + current.getValue().getTransaction().getAmount()
-                          + ", needs " + next.getValue().getTransaction().getAmount());
-            } else if (current.getValue().getTransaction().getAmount() < 0) {
-              pen.println("Negative amount in block" + current.getValue().getNum() + ": "
-                          + current.getValue().getTransaction().getAmount());
-            } // if/elif/elif
-            current = next;
-            next = chain.getNext();
-          } // while
+          try {
+            chain.check();
+          } catch (Exception e) {
+            Node1 current = chain.getNextBlk();
+
+            while (!(current == null)) {
+              Block currentBlock = current.getValue();
+              Transaction currentTransaction = current.getValue().getTransaction();
+
+              if (chain.balance(currentTransaction.getSource()) < 0) {
+                pen.println("Unknown source in block " + currentBlock.getNum() + ": \""
+                            + currentTransaction.getSource() + "\"");
+                break;
+              } else if (e.getMessage().contains("negative")) {
+                pen.println("Negative amount in block " + currentBlock.getNum() + ": "
+                            + currentTransaction.getAmount());
+                break;
+              } else if (e.getMessage().contains("Insufficient")) {
+                pen.println("Insufficient balance for " + currentTransaction.getTarget()
+                            + " in block " + currentBlock.getNum() + ": Has "
+                            + chain.balance(currentTransaction.getTarget()) + ", needs "
+                            + currentTransaction.getAmount());
+                break;
+              } // if/else
+
+              current = chain.getNextBlk().getNext().getNext();
+            } // while
+          } // try/catch
 
           if (chain.isCorrect()) {
             pen.println("The blockchain checks out.");
-          } else {
-            pen.println("The blockchain does NOT check out.");
-          } // if/else
+          } // if
           break;
 
         case "help":
@@ -180,12 +188,12 @@ public class BlockChainUI {
           break;
 
         case "remove":
-          pen.printf("Removing last block entry...\n", command);
           if (chain.removeLast()) {
-            pen.println("Successfully removed block.");
+            pen.println("Successfully removed last block.");
           } else {
-            pen.println("Failed to remove block.");
+            pen.println("Failed to remove last block.");
           } // if/else
+          mineCount--;
           break;
 
         case "transactions":
