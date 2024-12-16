@@ -1,0 +1,1 @@
+Modified computeHash method in src/main/java/edu/grinnell/csc207/blockchains/Block.java to avoid recreating the MessageDigest with each call of the method. As per the grader's recommendation.
