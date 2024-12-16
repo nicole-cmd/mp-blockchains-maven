@@ -115,12 +115,15 @@ public class Block {
    * @return The hash of the block.
    */
   static byte[] computeHash(int num, Transaction transaction, Hash prevHash, long nonce) {
-    try {
-      md = MessageDigest.getInstance("sha-256");
-    } catch (NoSuchAlgorithmException e) {
-      // Shouldn't happen
-    } // try/catch
-
+    if (num != 0) {
+      md.reset();
+    } else {
+      try {
+        md = MessageDigest.getInstance("sha-256");
+      } catch (NoSuchAlgorithmException e) {
+        // Shouldn't happen
+      } // try/catch
+    } // if/else
     md.update(intToBytes(num));
     md.update(transaction.getSource().getBytes());
     md.update(transaction.getTarget().getBytes());
